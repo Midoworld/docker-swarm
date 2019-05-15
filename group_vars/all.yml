@@ -1,0 +1,7 @@
+---
+# Global variables for all hosts and for all inventories
+ansible_python_interpreter: /usr/bin/python3
+
+docker_group: docker
+docker_compose_version: 1.23.2
+docker_compose_path: /usr/local/bin/docker-compose

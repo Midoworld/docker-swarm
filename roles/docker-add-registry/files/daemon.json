@@ -1,0 +1,7 @@
+{
+  "insecure-registries" : [
+    "docker-registry.devops.energisme.com:443",
+    "docker-private.devops.energisme.com:443",
+    "docker-thirdparty.devops.energisme.com:443"
+  ]
+}

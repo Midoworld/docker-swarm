@@ -1,0 +1,15 @@
+---
+# This playbook contains action to add a node as manager to the cluster
+
+# docker node ls
+- name: Check if swarm is already initialized
+  shell: docker node ls
+  register: swarm_status
+  ignore_errors: true
+  tags: swarm
+
+# docker swarm join --token <manager-token> <manager-master-address>
+- name: Add managers to the swarm
+  shell: docker swarm join --token {{ hostvars['manager-master']['manager_token']['stdout'] }} {{ hostvars['manager-master']['ansible_default_ipv4']['address'] }}:2377
+  when: swarm_status.rc != 0
+  tags: swarm

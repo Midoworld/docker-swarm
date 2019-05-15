@@ -1,0 +1,62 @@
+---
+# Upgrade the ubuntu packages
+- name: Upgrade packages
+  hosts: all
+  become: yes
+  roles:
+    - upgrade-packages
+
+- name: Install base packages
+  hosts: all
+  become: yes
+  roles:
+    - base
+
+# Create the docker user
+- name: Create docker user
+  hosts: all
+  become: yes
+  roles:
+    - create-sudo-user
+    - copy-ssh-key
+
+# Install docker and docker-compose
+- name: Install docker and docker-compose on all nodes
+  hosts: all
+  become: yes
+  roles:
+    - docker-installation
+    - docker-compose-installation
+    - docker-add-registry
+
+# Initialize docker swarm on the master manager
+- name: Initialize docker swarm
+  hosts: swarm-manager-master
+  become_user: "{{ docker_user }}"
+  become: yes
+  roles:
+    - docker-swarm-init
+
+# Add any manager to the swarm
+- name: Add managers to the swarm
+  hosts: swarm-manager
+  become_user: "{{ docker_user }}"
+  become: yes
+  roles:
+    - docker-swarm-add-manager
+
+# Add any worker to the swarm
+- name: Add workers to the swarm
+  hosts: swarm-worker
+  become_user: "{{ docker_user }}"
+  become: yes
+  roles:
+    - docker-swarm-add-worker
+
+# Login to the registry
+#- name: Login to registry
+#  hosts: all
+#  vars:
+#    ansible_user: "{{ docker_user }}"
+#  roles:
+#    - docker-login-registry

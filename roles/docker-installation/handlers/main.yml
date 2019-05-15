@@ -1,0 +1,9 @@
+---
+# This playbook contains common handlers that can be called in docker-installation tasks.
+
+# sudo systemctl enable docker
+- name: Start docker on boot
+  systemd:
+    name: docker
+    state: started
+    enabled: yes

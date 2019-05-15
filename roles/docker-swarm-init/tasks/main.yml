@@ -1,0 +1,47 @@
+---
+# This playbook initialize the swarm cluster on the master manager host
+
+# docker node ls
+- name: Check if swarm has already been initialized
+  shell: docker node ls
+  register: swarm_status
+  ignore_errors: true
+  tags: swarm
+
+# docker swarm init --advertise-addr=
+- name: Initialize docker swarm
+  shell: >
+        docker swarm init
+        --advertise-addr={{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:2377
+  when: swarm_status.rc != 0
+  tags: swarm
+
+# docker network ls
+- name: List networks
+  shell: docker network ls
+  register: docker_networks
+  tags: swarm
+
+# docker network create
+- name: Create network when not there
+  shell: docker network create --driver overlay --subnet {{ item.subnet }} --gateway {{ item.gateway}} {{ item.name }}
+  with_items:
+    - {
+        name: 'da_default',
+        subnet: '100.0.0.0/16',
+        gateway: '100.0.0.1'
+      }
+  when: docker_networks.stdout.find( item.name ) == -1
+  tags: swarm
+
+# docker swarm join-token -q manager
+- name: Register the manager join-token
+  shell: docker swarm join-token -q manager
+  register: manager_token
+  tags: swarm
+
+# docker swarm join-token -q worker
+- name: Register the worker join-token
+  shell: docker swarm join-token -q worker
+  register: worker_token
+  tags: swarm

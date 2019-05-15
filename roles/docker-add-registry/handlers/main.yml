@@ -1,0 +1,8 @@
+---
+# This playbook contains common handlers that can be called in docker-installation tasks.
+
+# sudo service docker restart
+- name: Restart docker
+  service:
+    name: docker
+    state: restarted

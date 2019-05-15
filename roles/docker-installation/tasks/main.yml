@@ -1,0 +1,88 @@
+---
+# This playbook contains docker installation and configuration actions that will be run on "all" nodes
+
+# sudo apt-get update
+#- name: Update apt packages
+#  apt:
+#    update_cache: yes
+#  tags: system
+
+# sudo apt install
+- name: Install docker packages
+  apt:
+    name: ['apt-transport-https','ca-certificates','curl','gnupg-agent','software-properties-common']
+    state: present
+    update_cache: yes
+  tags:
+    - docker
+
+# curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+- name: Add docker s official GPG key
+  apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    state: present
+  tags:
+    - docker
+
+# sudo apt-key fingerprint 0EBFCD88
+- name: Verify that we have the key with the fingerprint
+  apt_key:
+    id: 0EBFCD88
+    state: present
+  tags:
+    - docker
+
+# sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release) stable"
+- name: Set up the stable repository
+  apt_repository:
+    repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable
+    state: present
+    update_cache: yes
+  tags:
+    - docker
+
+# sudo apt update
+- name: Update apt packages
+  apt:
+    update_cache: yes
+  tags:
+    - docker
+
+# sudo apt-get install docker-ce docker-ce-cli containerd.io
+- name: Install docker-ce docker-ce-cli containerd.io
+  apt:
+    name: ['docker-ce','docker-ce-cli','containerd.io']
+    state: present
+    update_cache: yes
+  notify: Start docker on boot
+  tags:
+    - docker
+
+# sudo groupadd docker
+- name: Create "docker" group
+  group:
+    name: "{{ docker_group }}"
+    state: present
+  tags:
+    - docker
+
+# sudo usermod -aG docker rmeote_user
+- name: Add remote user to docker group
+  user:
+    name: "{{ docker_user }}"
+    group: "{{ docker_group }}"
+    append: yes
+  tags:
+    - docker
+
+# sudo apt autoclean
+- name: Remove useless apt packages from cache
+  apt:
+    autoclean: yes
+  tags: system
+
+# sudo apt autoremove
+- name: Remove dependencies that are no longer required
+  apt:
+    autoremove: yes
+  tags: system

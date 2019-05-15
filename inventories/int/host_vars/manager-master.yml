@@ -1,0 +1,3 @@
+---
+# Variables for the manager-master host
+ansible_host: 12.48.0.23

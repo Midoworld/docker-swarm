@@ -1,0 +1,14 @@
+---
+- name: Create sudo user docker
+  user:
+    name: "{{ docker_user }}"
+    groups: sudo
+    shell: /bin/bash
+    generate_ssh_key: no
+    state: present
+
+- name: Set passwordless SSH Access for docker user
+  copy:
+    src: sudoers
+    dest: /etc/sudoers.d
+    mode: 0440

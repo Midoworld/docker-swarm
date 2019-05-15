@@ -1,0 +1,7 @@
+---
+- name: Add registry to docker
+  copy:
+    src: daemon.json
+    dest: /etc/docker/
+  notify: Restart docker
+  tags: swarm

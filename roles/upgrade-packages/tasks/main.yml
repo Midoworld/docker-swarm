@@ -1,0 +1,27 @@
+---
+# This playbook contains actions to update, upgrade and clean ubuntu on all hosts
+
+# sudo apt update
+- name: Update APT package cache
+  apt: update_cache=yes
+  tags: system
+
+# sudo apt upgrade
+- name: Upgrade APT to the latest packages
+  apt: upgrade=dist
+  register: apt_result
+  tags: system
+
+# sudo apt -y autoremove
+- name: Autoremove unused packages
+  command: apt -y autoremove
+  register: apt_result
+  changed_when: "'packages will be REMOVED' in apt_result.stdout"
+  tags: system
+
+# sudo apt remove -y --purge
+- name: Purge residual kernel packages
+  shell: apt remove -y --purge $(dpkg -l | grep "^rc\s*linux-image-" | awk '{print $2}' | tr '\n' ' ')
+  register: apt_result
+  changed_when: "'packages will be REMOVED' in apt_result.stdout"
+  tags: system

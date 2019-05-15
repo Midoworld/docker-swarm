@@ -1,0 +1,10 @@
+---
+# Grouping hosts for local inventory
+all:
+  children:
+    swarm-manager-master:
+      hosts:
+        manager-master:
+    swarm-worker:
+      hosts:
+        worker-1:

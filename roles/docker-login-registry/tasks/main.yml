@@ -1,0 +1,11 @@
+---
+- name: Login to registries
+  docker_login:
+    registry: "{{ item }}"
+    username: "{{ registry_username }}"
+    password: "{{ registry_password }}"
+  with_items:
+    - docker-registry.devops.energisme.com:443
+    - docker-private.devops.energisme.com:443
+    - docker-thirdparty.devops.energisme.com:443
+  tags: swarm

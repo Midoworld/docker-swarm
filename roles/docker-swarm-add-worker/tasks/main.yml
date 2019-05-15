@@ -1,0 +1,15 @@
+---
+# This playbook contains action to add a node as worker to the cluster
+
+# docker info
+- name: Get docker info
+  shell: docker info
+  register: docker_info
+  changed_when: false
+
+# docker swarm join --token <woker-token> <manager-master-address>
+- name: Add Workers to the swarm
+  shell: docker swarm join --token {{ hostvars['manager-master']['worker_token']['stdout'] }} {{ hostvars['manager-master']['ansible_default_ipv4']['address'] }}:2377
+  when: "docker_info.stdout.find('Swarm: inactive') != -1"
+  retries: 3
+  delay: 20
